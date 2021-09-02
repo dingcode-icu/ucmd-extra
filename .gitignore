@@ -1,0 +1,11 @@
+# package ignore meta
+*.meta
+
+# ide 
+.vscode/
+.idea/
+
+
+
+
+

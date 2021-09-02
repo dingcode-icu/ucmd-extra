@@ -1,0 +1,10 @@
+{
+	"name":"com.dwb.ucmd",
+	"version":"1.0.0",
+	"displayName":"Ucmd BuildPlayer",
+	"author":{
+		"name":"dwb",
+		"email":"dwb@dwb.ren"
+	}
+
+}
