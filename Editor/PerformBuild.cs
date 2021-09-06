@@ -24,7 +24,7 @@ namespace Ucmd.BuildPlayer
 
         private static bool isNewCreate = true;
 
-        private static readonly string ProjName = Application.dataPath + "/../../../build/iPhone";
+        private static readonly string ProjBuildPath = Application.dataPath + "/../../../build/iPhone";
 
         /// <summary>
         /// 获取要打包的所有的scene
@@ -34,22 +34,6 @@ namespace Ucmd.BuildPlayer
         {
             return (from e in EditorBuildSettings.scenes where e != null where e.enabled select e.path).ToArray();
         }
-
-        /// <summary>
-        /// 打包路劲，不存在就创建
-        /// </summary>
-        /// <returns></returns>
-        private static string GetBuildPath()
-        {
-            if (!Directory.Exists(ProjName))
-            {
-                isNewCreate = true;
-                Directory.CreateDirectory(ProjName);
-            }
-
-            return ProjName;
-        }
-
 
         [PostProcessBuild(1)]
         public static void OnPostprocessBuild(BuildTarget buildTarget, string path)
@@ -189,70 +173,6 @@ namespace Ucmd.BuildPlayer
         }
 
         /// <summary>
-        /// 构建Process对象，并执行
-        /// </summary>
-        /// <param name="cmd">命令</param>
-        /// <param name="args">命令的参数</param>
-        /// <param name="workingDri">工作目录</param>
-        /// <returns>Process对象</returns>
-        private static Process CreateCmdProcess(string cmd, string args, string workingDir = "")
-        {
-            var en = System.Text.UTF8Encoding.UTF8;
-            if (Application.platform == RuntimePlatform.WindowsEditor)
-                en = System.Text.Encoding.GetEncoding("gb2312");
-
-            var pStartInfo = new System.Diagnostics.ProcessStartInfo(cmd);
-            pStartInfo.Arguments = args;
-            pStartInfo.CreateNoWindow = false;
-            pStartInfo.UseShellExecute = false;
-            pStartInfo.RedirectStandardError = true;
-            pStartInfo.RedirectStandardInput = true;
-            pStartInfo.RedirectStandardOutput = true;
-            pStartInfo.StandardErrorEncoding = en;
-            pStartInfo.StandardOutputEncoding = en;
-            if (!string.IsNullOrEmpty(workingDir))
-                pStartInfo.WorkingDirectory = workingDir;
-            return System.Diagnostics.Process.Start(pStartInfo);
-        }
-
-        /// <summary>
-        /// 运行命令,不返回stderr版本
-        /// </summary>
-        /// <param name="cmd">命令</param>
-        /// <param name="args">命令的参数</param>
-        /// <param name="workingDri">工作目录</param>
-        /// <returns>命令的stdout输出</returns>
-        public static string RunCmdNoErr(string cmd, string args, string workingDri = "")
-        {
-            var p = CreateCmdProcess(cmd, args, workingDri);
-            var res = p.StandardOutput.ReadToEnd();
-            p.Close();
-            return res;
-        }
-
-        /// <summary>
-        /// 运行命令,不返回stderr版本
-        /// </summary>
-        /// <param name="cmd">命令</param>
-        /// <param name="args">命令的参数</param>
-        /// <param name="input">StandardInput</param>
-        /// <param name="workingDri">工作目录</param>
-        /// <returns>命令的stdout输出</returns>
-        public static string RunCmdNoErr(string cmd, string args, string[] input, string workingDri = "")
-        {
-            var p = CreateCmdProcess(cmd, args, workingDri);
-            if (input != null && input.Length > 0)
-            {
-                for (int i = 0; i < input.Length; i++)
-                    p.StandardInput.WriteLine(input[i]);
-            }
-
-            var res = p.StandardOutput.ReadToEnd();
-            p.Close();
-            return res;
-        }
-
-        /// <summary>
         /// 执行打包逻辑
         /// </summary>
         [MenuItem("Tools/Zyb/iOS/BuildIOS")]
@@ -260,7 +180,7 @@ namespace Ucmd.BuildPlayer
         {
             Debug.Log("CommandLineBuild start...\n------------------\n------------------");
             var scenes = GetBuildScenes();
-            var path = GetBuildPath();
+            var path = BuildHelper.CheckBuildPath(ProjBuildPath);
             if (scenes == null || scenes.Length == 0 || path == null)
             {
                 Debug.LogError($"Failed to build...{ErrorDesc[101]}");
@@ -289,7 +209,7 @@ namespace Ucmd.BuildPlayer
         [MenuItem("Tools/Zyb/iOS/ExportIPA")]
         private static void ExportIPA()
         {
-            var path = GetBuildPath();
+            var path = BuildHelper.CheckBuildPath(ProjBuildPath);
             CommandLineBuild();
             // //运行命令
             string[] sttrs = BuildHelper.RunCmd("xcodebuild", "clean", path);

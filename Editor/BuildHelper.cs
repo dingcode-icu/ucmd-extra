@@ -161,12 +161,6 @@ namespace Ucmd.BuildPlayer
             return false;
         }
 
-        public static void CallDingRobot(string binf, string path, string plat, string name)
-        {
-            var bin = $"{Application.dataPath}/../../../../ding-robot";
-            RunCmd($"{bin}", $"-d {binf} -i true -n {name} -p {plat}", "");
-        }
-
         /// <summary>
         /// 运行命令
         /// </summary>
