@@ -39,8 +39,8 @@ Custom require command args:isDev = {isDev}
             EditorUserBuildSettings.development = isDev;
             //是否是导出工程 
             EditorUserBuildSettings.exportAsGoogleAndroidProject = isExport;
-            //是否是调试模式
-            EditorUserBuildSettings.development = true;
+            //是否有额外编译宏
+            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, buildSymbols);
             //android
             EditorUserBuildSettings.androidBuildSubtarget = MobileTextureSubtarget.ASTC;
             // EditorUserBuildSettings.

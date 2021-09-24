@@ -172,10 +172,16 @@ namespace Ucmd.BuildPlayer
             string[] res = new string[2];
             var p = CreateCmdProcess(cmd, args, workingDir);
             res[0] = p.StandardOutput.ReadToEnd();
+            if (res[0].Length > 0)
+            {
+                Debug.Log(res[0]);
+            }
+
             res[1] = p.StandardError.ReadToEnd();
-#if !UNITY_IOS
-            res[2] = p.ExitCode.ToString();
-#endif
+            if (res[1].Length > 0)
+            {
+                Debug.LogError(res[1]);
+            }
             p.Close();
             return res;
         }

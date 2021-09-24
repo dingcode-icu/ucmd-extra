@@ -14,6 +14,8 @@ namespace Ucmd.BuildPlayer
 
         protected static bool isDev { set; get; }
 
+        protected static string buildSymbols = "";
+
         public delegate void UcmdBuildHook(HookType htype);
 
         public static UcmdBuildHook buildHook { set; get; }
@@ -25,7 +27,7 @@ namespace Ucmd.BuildPlayer
 
         protected static void CheckRequireArgs()
         {
-            //检查是否有isDev(require)相关参数
+            //检查是否有isDev(require)参数
             var args = Environment.GetCommandLineArgs();
             var isRequire = false;
             foreach (var s in args)
@@ -42,6 +44,13 @@ namespace Ucmd.BuildPlayer
 Not found require command args:-isRelease:xxx
 ***********************************") );
                 EditorApplication.Exit(101);
+            }
+            //检查是否有buildSympol(option)参数
+            foreach (var s in args)
+            {
+                if (!s.Contains("-buildSymbols:")) continue;
+                buildSymbols = s.Split(':')[1];
+                break;
             }
         }
     }

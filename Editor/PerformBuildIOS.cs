@@ -15,7 +15,7 @@ using PBXProject = UnityEditor.iOS.Xcode.PBXProject;
 
 namespace Ucmd.BuildPlayer
 {
-    public class PerformBuild : BuildBase
+    public class PerformBuildIOS : BuildBase
     {
         private static readonly Dictionary<int, string> ErrorDesc = new Dictionary<int, string>
         {
@@ -189,7 +189,11 @@ namespace Ucmd.BuildPlayer
 
             //检查是否有isDev(require)相关参数
             CheckRequireArgs();
-
+            Debug.Log($@"
+***********************************
+Custom require command args:isDev = {isDev}
+***********************************
+");
             //是否是测试包
             EditorUserBuildSettings.development = isDev;
             Debug.Log($"Path: \"{path}\"");
@@ -198,7 +202,8 @@ namespace Ucmd.BuildPlayer
                 {
                     Debug.Log($"Scene[{i}]: \"{scenes[i]}\"");
                 }
-
+            //是否有额外编译宏
+            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.iOS, buildSymbols);
             var option = isNewCreate ? BuildOptions.None : BuildOptions.AcceptExternalModificationsToPlayer; //is append
             BuildPipeline.BuildPlayer(scenes, path, BuildTarget.iOS, option);
 
@@ -207,7 +212,7 @@ namespace Ucmd.BuildPlayer
         }
 
         [MenuItem("Tools/Zyb/iOS/ExportIPA")]
-        private static void ExportIPA()
+        public static void ExportIPA()
         {
             var path = BuildHelper.CheckBuildPath(ProjBuildPath);
             CommandLineBuild();

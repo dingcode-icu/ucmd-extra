@@ -5,7 +5,7 @@
     ],
     "includePlatforms": [
         "Editor",
-        "iOS"
+        "macOSStandalone"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
