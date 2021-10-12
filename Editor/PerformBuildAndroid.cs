@@ -55,27 +55,8 @@ Custom require command args:isDev = {isDev}
         }
 
         /// <summary>
-        /// 导出工程
+        /// Ucmd外部调用函数入口
         /// </summary>
-        [MenuItem("Tools/Zyb/Android/ExportProj")]
-        public static void ExportProj()
-        {
-            CommandLineExport(true);
-        }
-
-        /// <summary>
-        /// 生成apk
-        /// </summary>
-        [MenuItem("Tools/Zyb/Android/ExportAndGenAPK")]
-        public static void ExportAndGenAPK()
-        {
-            CommandLineExport(false);
-        }
-
-        /// <summary>
-        /// 导出需要拷贝的资源
-        /// </summary>
-        [MenuItem("Tools/Zyb/Android/Asset&BinForNa")]
         public static void ExportProjAsset()
         {
             var res = new Dictionary<string, string>

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using UnityEditor;
 using Debug = UnityEngine.Debug;
 
+// ReSharper disable once CheckNamespace
 namespace Ucmd.BuildPlayer
 {
     public class BuildBase
@@ -37,14 +38,16 @@ namespace Ucmd.BuildPlayer
                 isRequire = true;
                 break;
             }
+
             if (isRequire == false)
             {
                 Debug.LogException(new Exception(@"
 ***********************************
 Not found require command args:-isRelease:xxx
-***********************************") );
+***********************************"));
                 EditorApplication.Exit(101);
             }
+
             //检查是否有buildSympol(option)参数
             foreach (var s in args)
             {

@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
+// ReSharper disable once CheckNamespace
 namespace Ucmd.BuildPlayer
 {
     public static class BuildHelper
@@ -182,6 +183,7 @@ namespace Ucmd.BuildPlayer
             {
                 Debug.LogError(res[1]);
             }
+
             p.Close();
             return res;
         }
@@ -192,11 +194,11 @@ namespace Ucmd.BuildPlayer
         /// </summary>
         /// <param name="cmd">命令</param>
         /// <param name="args">命令的参数</param>
-        /// <param name="workingDri">工作目录</param>
+        /// <param name="workingDir">工作目录</param>
         /// <returns>Process对象</returns>
         private static System.Diagnostics.Process CreateCmdProcess(string cmd, string args, string workingDir = "")
         {
-            var en = System.Text.UTF8Encoding.UTF8;
+            var en = System.Text.Encoding.UTF8;
             if (Application.platform == RuntimePlatform.WindowsEditor)
                 en = System.Text.Encoding.GetEncoding("gb2312");
 

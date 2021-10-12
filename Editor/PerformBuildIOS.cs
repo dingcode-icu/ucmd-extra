@@ -172,10 +172,6 @@ namespace Ucmd.BuildPlayer
             }
         }
 
-        /// <summary>
-        /// 执行打包逻辑
-        /// </summary>
-        [MenuItem("Tools/Zyb/iOS/BuildIOS")]
         public static void CommandLineBuild()
         {
             Debug.Log("CommandLineBuild start...\n------------------\n------------------");
@@ -211,7 +207,9 @@ Custom require command args:isDev = {isDev}
             ExecuteHook(HookType.Finish);
         }
 
-        [MenuItem("Tools/Zyb/iOS/ExportIPA")]
+        /// <summary>
+        /// Ucmd外部调用函数入口
+        /// </summary>
         public static void ExportIPA()
         {
             var path = BuildHelper.CheckBuildPath(ProjBuildPath);
