@@ -25,22 +25,16 @@ namespace Ucmd.BuildPlayer
 
         private static void CommandLineExport(bool isExport)
         {
-            Debug.Log("CommandLineBuild start...\n------------------\n------------------");
             var scenes = GetBuildScenes();
-
-            //检查是否有isDev(require)相关参数
+            //检查是否有外部传入参数
             CheckRequireArgs();
-            Debug.Log($@"
-***********************************
-Custom require command args:isDev = {isDev}
-***********************************
-");
+            CheckOptionArgs();
             //是否是测试包
-            EditorUserBuildSettings.development = isDev;
+            EditorUserBuildSettings.development = IsRelease;
             //是否是导出工程 
             EditorUserBuildSettings.exportAsGoogleAndroidProject = isExport;
             //是否有额外编译宏
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, buildSymbols);
+            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, BuildSymbols);
             //android
             EditorUserBuildSettings.androidBuildSubtarget = MobileTextureSubtarget.ASTC;
             // EditorUserBuildSettings.
@@ -71,7 +65,6 @@ Custom require command args:isDev = {isDev}
                 var f = Path.Combine(ProjBuildPath, cell.Key);
                 BuildHelper.DirectoryCopy(f, Path.Combine(NaAssetPath, cell.Value), true);
             }
-
             ExecuteHook(HookType.Finish);
         }
     }

@@ -1,60 +1,105 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEditor;
 using Debug = UnityEngine.Debug;
+using Enumerable = System.Linq.Enumerable;
 
 // ReSharper disable once CheckNamespace
 namespace Ucmd.BuildPlayer
 {
     public class BuildBase
     {
+        #region 基础属性及参数
+
         public enum HookType
         {
             Finish
         }
 
-        protected static bool isDev { set; get; }
+        /// <summary>
+        /// 打包命令传入：是否是release编译
+        /// </summary>
+        protected static bool IsRelease { set; get; }
 
-        protected static string buildSymbols = "";
+        /// <summary>
+        /// 打包命令传入：宏定义
+        /// </summary>
+        protected static string BuildSymbols = "";
 
-        public delegate void UcmdBuildHook(HookType htype);
+        /// <summary>
+        /// 打包命令传入: 目标平台
+        /// </summary>
+        protected static string TargetPlatform = "";
 
-        public static UcmdBuildHook buildHook { set; get; }
+        /// <summary>
+        /// 打包命令支持的平台
+        /// </summary>
+        protected static readonly List<string> SupportPlat = new List<string>()
+        {
+            "android",
+            "ios"
+        };
+
+        #endregion
+
+        #region Hook相关
+
+        public delegate void UcmdBuildHook(HookType t);
+
+        public static UcmdBuildHook BuildHook { set; get; }
 
         protected static void ExecuteHook(HookType hType)
         {
-            buildHook?.Invoke(hType);
+            BuildHook?.Invoke(hType);
+        }
+
+        #endregion
+
+        #region 外部语言传参
+
+        protected static  void CheckOptionArgs()
+        {
+            var args = Environment.GetCommandLineArgs();
+            foreach (var s in args)
+            {
+                //检查是否有buildSymbols(option)参数
+                if (s.Contains("-buildSymbols:"))
+                {
+                    BuildSymbols = s.Split(':')[1];
+                }
+
+                //检查是否是isRelease
+                if (s.Contains("-isRelease:"))
+                {
+                    IsRelease = s.Split(':')[1] != "false";
+                }
+
+                //检查目标平台
+                if (s.Contains("-targetPlatform:"))
+                {
+                    TargetPlatform = s.Split(':')[1];
+                }
+
+            }
+
+            Debug.Log($@"
+***********************************
+Option params in command:
+isRelease : {IsRelease}
+buildSymbols: {BuildSymbols}
+targetPlatform: {TargetPlatform}
+***********************************
+");
         }
 
         protected static void CheckRequireArgs()
         {
             //检查是否有isDev(require)参数
             var args = Environment.GetCommandLineArgs();
-            var isRequire = false;
-            foreach (var s in args)
-            {
-                if (!s.Contains("-isRelease:")) continue;
-                isDev = s.Split(':')[1] == "debug";
-                isRequire = true;
-                break;
-            }
-
-            if (isRequire == false)
-            {
-                Debug.LogException(new Exception(@"
-***********************************
-Not found require command args:-isRelease:xxx
-***********************************"));
-                EditorApplication.Exit(101);
-            }
-
-            //检查是否有buildSympol(option)参数
-            foreach (var s in args)
-            {
-                if (!s.Contains("-buildSymbols:")) continue;
-                buildSymbols = s.Split(':')[1];
-                break;
-            }
+            //TODO no require params
         }
+
+        #endregion
     }
 }
