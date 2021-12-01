@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -18,11 +19,23 @@ namespace Ucmd.BuildPlayer
             {
                 if (p.StartsWith(path) && p != path)
                 {
+                    if (p.EndsWith(".cs") ||
+                         p.EndsWith(".unity") ||
+                          p.Contains("squishy")) continue;
+                    if (IsSepLuaScript(p)) continue;
+                    if (!Path.HasExtension(p)) continue;
                     rl.Add(p);
                 }
             }
 
             return rl;
+        }
+
+        private static bool IsSepLuaScript(string fName)
+        {
+            return fName.Contains(".lua") &&
+                   !fName.Contains("luapack.lua");
+            
         }
 
         private static (string, BuildTarget) GetOsExStr(string tarp)
@@ -37,6 +50,44 @@ namespace Ucmd.BuildPlayer
                     return ("", BuildTarget.StandaloneOSX);
             }
         }
+
+        // private static string SquishLuaPack(string rootDir)
+        // {
+        //     var outF = "";
+        //     const string luaF = "luapack.lua.txt";
+        //     Debug.Log("Check there is lua scripts need to pack....");
+        //     var srcPath =  Path.Combine(Application.dataPath,"../../../../", rootDir, "scripts");
+        //     if (Directory.Exists(srcPath))
+        //     {
+        //         var tire = $"{Application.dataPath}/../../../tools/luapack";
+        //         var cmd = $"{tire}/squish {srcPath}";
+
+        //         var ret = BuildHelper.RunCmd(Path.Combine(tire, "lua"), cmd);
+        //         if (!ret[0].Contains("OK!"))
+        //         {
+        //             throw new Exception($"Run squish command raise error!{ret[0]}");
+        //         }
+
+        //         if (!File.Exists(luaF))
+        //         {
+        //             throw new Exception($"Not found the squish build file {luaF}");
+        //         }
+
+        //         outF = Path.Combine(Application.dataPath,"../../../../", rootDir, luaF);
+        //         if (File.Exists(outF))
+        //         {
+        //             File.Delete(outF);
+        //         }
+
+        //         File.Move(luaF, outF);
+        //         Debug.Log("Lua script pack suc!");
+        //     }
+
+        //     return outF;
+        // }
+
+
+
 
         /// <summary>
         /// 从外部调用 构建ab包
@@ -54,6 +105,7 @@ namespace Ucmd.BuildPlayer
                 Debug.Log("Not found relative path to execute build asset bundle. ");
                 Environment.Exit(0);
             }
+
             var ls = _relPath.Split('|');
             Debug.Log($"{ls}");
             foreach (var p in ls)
@@ -65,9 +117,12 @@ namespace Ucmd.BuildPlayer
                 var pl = GetPathAssets(assetPath);
                 foreach (var f in pl)
                 {
+
                     var ai = AssetImporter.GetAtPath(f);
+
                     ai.assetBundleName = name;
                 }
+
                 var (ex, tar) = GetOsExStr(TargetPlatform);
                 var cur = $"{DateTime.Now:yyyyMMddhhmmss}";
                 Debug.Log($"bundle_{name}{ex}_{cur}.ab---->>>>11");
@@ -78,6 +133,8 @@ namespace Ucmd.BuildPlayer
                 };
                 BuildPipeline.BuildAssetBundles(dir, new[] {ab}, BuildAssetBundleOptions.None, tar);
             }
+
+            ExecuteHook(HookType.Finish);
         }
 
         protected new static void CheckOptionArgs()

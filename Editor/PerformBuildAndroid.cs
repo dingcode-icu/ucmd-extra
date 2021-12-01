@@ -13,7 +13,9 @@ namespace Ucmd.BuildPlayer
         private static readonly string ProjBuildPath = Application.dataPath + "/../../../build/Android";
         private static readonly string NaAssetPath = Path.Combine(ProjBuildPath, "../UnityfoNa");
 
-
+#if UNITY_ANDROID_API
+        private static AndroidArchitecture TargetArchitectures = AndroidArchitecture.ARMv7;
+#endif
         /// <summary>
         /// 获取要打包的所有的scene
         /// </summary>
@@ -35,6 +37,12 @@ namespace Ucmd.BuildPlayer
             EditorUserBuildSettings.exportAsGoogleAndroidProject = isExport;
             //是否有额外编译宏
             PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, BuildSymbols);
+#if UNITY_ANDROID_API
+            Debug.Log($"archive set here{TargetArchitectures.ToString()}");
+
+            //32还是64
+            PlayerSettings.Android.targetArchitectures = TargetArchitectures;
+#endif
             //android
             EditorUserBuildSettings.androidBuildSubtarget = MobileTextureSubtarget.ASTC;
             // EditorUserBuildSettings.
@@ -65,7 +73,42 @@ namespace Ucmd.BuildPlayer
                 var f = Path.Combine(ProjBuildPath, cell.Key);
                 BuildHelper.DirectoryCopy(f, Path.Combine(NaAssetPath, cell.Value), true);
             }
+
             ExecuteHook(HookType.Finish);
+        }
+
+        private new static void CheckOptionArgs()
+        {
+            BuildBase.CheckOptionArgs();
+            var args = Environment.GetCommandLineArgs();
+            foreach (var s in args)
+            {
+                if (s.Contains("-targetArch:"))
+                {
+                    var ar = s.Split(':')[1];
+                    switch (ar)
+                    {
+                        case "arm64":
+                            TargetArchitectures = AndroidArchitecture.ARM64;
+                            break;
+                        case "all":
+                            TargetArchitectures = AndroidArchitecture.All;
+                            break;
+                        default:
+                            TargetArchitectures = AndroidArchitecture.ARMv7;
+                            break;
+                    }
+
+                    ;
+                }
+            }
+
+            Debug.Log($@"
+***********************************
+Android Option params in command:
+targetArch : {TargetArchitectures.ToString()}
+***********************************
+");
         }
     }
 }
