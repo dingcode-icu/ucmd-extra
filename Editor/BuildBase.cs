@@ -12,8 +12,9 @@ namespace Ucmd.BuildPlayer
     {
         #region 基础属性及参数
 
-        public enum HookType
+        protected enum HookType
         {
+            Before,
             Finish
         }
 
@@ -32,22 +33,13 @@ namespace Ucmd.BuildPlayer
         /// </summary>
         protected static string TargetPlatform = "";
 
-        /// <summary>
-        /// 打包命令支持的平台
-        /// </summary>
-        protected static readonly List<string> SupportPlat = new List<string>()
-        {
-            "android",
-            "ios"
-        };
-
         #endregion
 
         #region Hook相关
 
-        public delegate void UcmdBuildHook(HookType t);
+        private delegate void UcmdBuildHook(HookType t);
 
-        public static UcmdBuildHook BuildHook { set; get; }
+        private static UcmdBuildHook BuildHook { set; get; }
 
         protected static void ExecuteHook(HookType hType)
         {

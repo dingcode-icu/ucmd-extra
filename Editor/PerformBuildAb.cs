@@ -137,7 +137,7 @@ namespace Ucmd.BuildPlayer
             ExecuteHook(HookType.Finish);
         }
 
-        protected new static void CheckOptionArgs()
+        private new static void CheckOptionArgs()
         {
             BuildBase.CheckOptionArgs();
             var args = Environment.GetCommandLineArgs();
@@ -150,12 +150,6 @@ namespace Ucmd.BuildPlayer
                     _relPath = o.Substring(0, o.Length - 1);
                     ;
                     Debug.Log($"rel value is {_relPath}");
-                }
-
-                //检查目标平台参数
-                if (SupportPlat.Contains(s))
-                {
-                    TargetPlatform = s;
                 }
             }
         }

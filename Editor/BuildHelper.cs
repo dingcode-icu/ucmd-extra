@@ -18,15 +18,6 @@ namespace Ucmd.BuildPlayer
         public static bool IsNewCreate = false;
 
         /// <summary>
-        /// 获取要打包的所有的scene
-        /// </summary>
-        /// <returns></returns>
-        public static string[] GetBuildScenes()
-        {
-            return (from e in EditorBuildSettings.scenes where e != null where e.enabled select e.path).ToArray();
-        }
-
-        /// <summary>
         /// 打包路径，不存在就创建
         /// </summary>
         /// <returns></returns>

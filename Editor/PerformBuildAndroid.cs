@@ -37,12 +37,6 @@ namespace Ucmd.BuildPlayer
             EditorUserBuildSettings.exportAsGoogleAndroidProject = isExport;
             //是否有额外编译宏
             PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, BuildSymbols);
-#if UNITY_ANDROID_API
-            Debug.Log($"archive set here{TargetArchitectures.ToString()}");
-
-            //32还是64
-            PlayerSettings.Android.targetArchitectures = TargetArchitectures;
-#endif
             //android
             EditorUserBuildSettings.androidBuildSubtarget = MobileTextureSubtarget.ASTC;
             // EditorUserBuildSettings.
@@ -59,7 +53,7 @@ namespace Ucmd.BuildPlayer
         /// <summary>
         /// Ucmd外部调用函数入口
         /// </summary>
-        public static void ExportProjAsset()
+        public static void Run()
         {
             var res = new Dictionary<string, string>
             {
@@ -80,10 +74,12 @@ namespace Ucmd.BuildPlayer
         private new static void CheckOptionArgs()
         {
             BuildBase.CheckOptionArgs();
+
+#if UNITY_ANDROID_API
             var args = Environment.GetCommandLineArgs();
             foreach (var s in args)
             {
-                if (s.Contains("-targetArch:"))
+                if (s.Contains("-arch:"))
                 {
                     var ar = s.Split(':')[1];
                     switch (ar)
@@ -109,6 +105,7 @@ Android Option params in command:
 targetArch : {TargetArchitectures.ToString()}
 ***********************************
 ");
+#endif
         }
     }
 }

@@ -1,13 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using Debug = UnityEngine.Debug;
-
-#if UNITY_EDITOR_OSX
 
 
 namespace Ucmd.BuildPlayer
@@ -31,8 +25,11 @@ namespace Ucmd.BuildPlayer
         {
             return (from e in EditorBuildSettings.scenes where e != null where e.enabled select e.path).ToArray();
         }
-
-        public static void CommandLineBuild()
+        
+        /// <summary>
+        /// Ucmd外部调用函数入口
+        /// </summary>
+        public static void Run()
         {
             var scenes = GetBuildScenes();
             var path = BuildHelper.CheckBuildPath(ProjBuildPath);
@@ -49,4 +46,3 @@ namespace Ucmd.BuildPlayer
         }
     }
 }
-#endif
