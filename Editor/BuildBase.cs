@@ -1,17 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using UnityEditor;
-using Debug = UnityEngine.Debug;
-using Enumerable = System.Linq.Enumerable;
-
 // ReSharper disable once CheckNamespace
+
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
+
 namespace Ucmd.BuildPlayer
 {
     public class BuildBase
     {
         #region 基础属性及参数
-
         protected enum HookType
         {
             Before,
@@ -27,13 +24,31 @@ namespace Ucmd.BuildPlayer
         /// 打包命令传入：宏定义
         /// </summary>
         protected static string BuildSymbols = "";
-
-        /// <summary>
-        /// 打包命令传入: 目标平台
-        /// </summary>
-        protected static string TargetPlatform = "";
+        
 
         #endregion
+
+
+        protected BuildBase()
+        {
+            IsRelease = StaticCall.ArgMap["isRelease"] == "true";
+            BuildSymbols = StaticCall.ArgMap.ContainsKey("buildSymbols") ? StaticCall.ArgMap["buildSymbols"] : "";
+        }
+
+        protected static string[] GetScenes()
+        {
+            var lScenes = new List<string>();
+            foreach (var scene in EditorBuildSettings.scenes)
+            {
+                if (scene.path.StartsWith("_"))
+                {
+                    break;
+                } 
+                if (!scene.enabled) break;
+                lScenes.Add(scene.path);
+            }
+            return lScenes.ToArray();
+        } 
 
         #region Hook相关
 
@@ -44,52 +59,6 @@ namespace Ucmd.BuildPlayer
         protected static void ExecuteHook(HookType hType)
         {
             BuildHook?.Invoke(hType);
-        }
-
-        #endregion
-
-        #region 外部语言传参
-
-        protected static  void CheckOptionArgs()
-        {
-            var args = Environment.GetCommandLineArgs();
-            foreach (var s in args)
-            {
-                //检查是否有buildSymbols(option)参数
-                if (s.Contains("-buildSymbols:"))
-                {
-                    BuildSymbols = s.Split(':')[1];
-                }
-
-                //检查是否是isRelease
-                if (s.Contains("-isRelease:"))
-                {
-                    IsRelease = s.Split(':')[1] != "false";
-                }
-
-                //检查目标平台
-                if (s.Contains("-targetPlatform:"))
-                {
-                    TargetPlatform = s.Split(':')[1];
-                }
-
-            }
-
-            Debug.Log($@"
-***********************************
-Option params in command:
-isRelease : {IsRelease}
-buildSymbols: {BuildSymbols}
-targetPlatform: {TargetPlatform}
-***********************************
-");
-        }
-
-        protected static void CheckRequireArgs()
-        {
-            //检查是否有isDev(require)参数
-            var args = Environment.GetCommandLineArgs();
-            //TODO no require params
         }
 
         #endregion

@@ -23,7 +23,7 @@ namespace Unity.BuildReportInspector.Mobile
                 report.summary.result == BuildResult.Cancelled)
                 return;
                     
-            // Save the guid for BuildPostProcess callback.
+            // Save the guid for BuildPostProcess callback. 
             s_LastBuildGuid = report.summary.guid.ToString();
 
             if (report.summary.platform != BuildTarget.iOS && report.summary.platform != BuildTarget.tvOS)

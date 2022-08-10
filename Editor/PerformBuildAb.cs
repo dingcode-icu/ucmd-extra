@@ -94,10 +94,6 @@ namespace Ucmd.BuildPlayer
         /// </summary>
         public static void Build()
         {
-            //检查参数
-            CheckOptionArgs();
-            CheckRequireArgs();
-
             var dir = BuildHelper.CheckBuildPath(AbBuildPath);
             Debug.Log(_relPath);
             if (_relPath == string.Empty)
@@ -123,7 +119,7 @@ namespace Ucmd.BuildPlayer
                     ai.assetBundleName = name;
                 }
 
-                var (ex, tar) = GetOsExStr(TargetPlatform);
+                var (ex, tar) = GetOsExStr("ab");
                 var cur = $"{DateTime.Now:yyyyMMddhhmmss}";
                 Debug.Log($"bundle_{name}{ex}_{cur}.ab---->>>>11");
                 var ab = new AssetBundleBuild()
@@ -133,25 +129,8 @@ namespace Ucmd.BuildPlayer
                 };
                 BuildPipeline.BuildAssetBundles(dir, new[] {ab}, BuildAssetBundleOptions.None, tar);
             }
-
             ExecuteHook(HookType.Finish);
         }
 
-        private new static void CheckOptionArgs()
-        {
-            BuildBase.CheckOptionArgs();
-            var args = Environment.GetCommandLineArgs();
-            foreach (var s in args)
-            {
-                //检查要打包的相对路径列表
-                if (s.Contains("-abMap:"))
-                {
-                    var o = s.Split(':')[1];
-                    _relPath = o.Substring(0, o.Length - 1);
-                    ;
-                    Debug.Log($"rel value is {_relPath}");
-                }
-            }
-        }
     }
 }

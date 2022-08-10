@@ -10,8 +10,15 @@ namespace Ucmd.BuildPlayer
 {
     public class PerformBuildAndroid : BuildBase
     {
-        private static readonly string ProjBuildPath = Application.dataPath + "/../../../build/Android";
+        private static readonly string ProjBuildPath = Application.dataPath + "/../../../.ucmd_build/Android";
         private static readonly string NaAssetPath = Path.Combine(ProjBuildPath, "../UnityfoNa");
+
+        PerformBuildAndroid()
+        {
+            Debug.Log($"@" +
+                      $"isRelease:{BuildBase.IsRelease}" +
+                      $"buildTarget{BuildBase.BuildSymbols}");
+        }
 
 #if UNITY_ANDROID_API
         private static AndroidArchitecture TargetArchitectures = AndroidArchitecture.ARMv7;
@@ -22,22 +29,20 @@ namespace Ucmd.BuildPlayer
         /// <returns></returns>
         private static string[] GetBuildScenes()
         {
+            
             return (from e in EditorBuildSettings.scenes where e != null where e.enabled select e.path).ToArray();
         }
 
-        private static void CommandLineExport(bool isExport)
+        private static void CommandBuild(bool isExport)
         {
             var scenes = GetBuildScenes();
-            //检查是否有外部传入参数
-            CheckRequireArgs();
-            CheckOptionArgs();
-            //是否是测试包
+            //isRelease?
             EditorUserBuildSettings.development = IsRelease;
-            //是否是导出工程 
+            //isExport? 
             EditorUserBuildSettings.exportAsGoogleAndroidProject = isExport;
             //是否有额外编译宏
             PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, BuildSymbols);
-            //android
+            //android默认目标
             EditorUserBuildSettings.androidBuildSubtarget = MobileTextureSubtarget.ASTC;
             // EditorUserBuildSettings.
             var e = BuildHelper.CheckBuildPath(ProjBuildPath);
@@ -55,13 +60,13 @@ namespace Ucmd.BuildPlayer
         /// </summary>
         public static void Run()
         {
+            BuildHelper.CleanPath(NaAssetPath);
             var res = new Dictionary<string, string>
             {
                 {"unityLibrary/src/main/assets/bin", "unityLibrary/src/main/assets/bin"},
                 {"unityLibrary/src/main/jniLibs/armeabi-v7a", "unityLibrary/src/main/jniLibs/armeabi-v7a"}
             };
-            BuildHelper.CheckAssetBuildPath(NaAssetPath);
-            CommandLineExport(true);
+            CommandBuild(true);
             foreach (var cell in res)
             {
                 var f = Path.Combine(ProjBuildPath, cell.Key);
@@ -69,43 +74,6 @@ namespace Ucmd.BuildPlayer
             }
 
             ExecuteHook(HookType.Finish);
-        }
-
-        private new static void CheckOptionArgs()
-        {
-            BuildBase.CheckOptionArgs();
-
-#if UNITY_ANDROID_API
-            var args = Environment.GetCommandLineArgs();
-            foreach (var s in args)
-            {
-                if (s.Contains("-arch:"))
-                {
-                    var ar = s.Split(':')[1];
-                    switch (ar)
-                    {
-                        case "arm64":
-                            TargetArchitectures = AndroidArchitecture.ARM64;
-                            break;
-                        case "all":
-                            TargetArchitectures = AndroidArchitecture.All;
-                            break;
-                        default:
-                            TargetArchitectures = AndroidArchitecture.ARMv7;
-                            break;
-                    }
-
-                    ;
-                }
-            }
-
-            Debug.Log($@"
-***********************************
-Android Option params in command:
-targetArch : {TargetArchitectures.ToString()}
-***********************************
-");
-#endif
         }
     }
 }

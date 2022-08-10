@@ -34,15 +34,10 @@ namespace Ucmd.BuildPlayer
         /// 导出路径，存在就删除刷新
         /// </summary>
         /// <returns></returns>
-        public static string CheckAssetBuildPath(string buildPath)
+        public static void CleanPath(string buildPath)
         {
-            if (Directory.Exists(buildPath))
-            {
-                Debug.Log($"remove the dir {buildPath}");
-                Directory.Delete(buildPath, true);
-            }
-
-            return buildPath;
+            if (!Directory.Exists(buildPath)) return;
+            Directory.Delete(buildPath, true);
         }
 
 
