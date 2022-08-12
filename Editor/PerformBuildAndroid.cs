@@ -10,14 +10,20 @@ namespace Ucmd.BuildPlayer
 {
     public class PerformBuildAndroid : BuildBase
     {
-        private static readonly string ProjBuildPath = Application.dataPath + "/../../../.ucmd_build/Android";
-        private static readonly string NaAssetPath = Path.Combine(ProjBuildPath, "../UnityfoNa");
+        /// <summary>
+        /// 打包命令传入：宏定义
+        /// </summary>
+        private static string ArchTarget = "";
+
 
         PerformBuildAndroid()
         {
+            ArchTarget = StaticCall.ArgMap.ContainsKey("archTarget") ? StaticCall.ArgMap["archTarget"] : "arm-v7";
             Debug.Log($"@" +
-                      $"isRelease:{BuildBase.IsRelease}" +
-                      $"buildTarget{BuildBase.BuildSymbols}");
+                      $"isRelease:{IsRelease}" +
+                      $"buildTarget{BuildSymbols}" +
+                      $"outputPath{OutputPath}" +
+                      $"archTarget{ArchTarget}");
         }
 
 #if UNITY_ANDROID_API
@@ -29,7 +35,6 @@ namespace Ucmd.BuildPlayer
         /// <returns></returns>
         private static string[] GetBuildScenes()
         {
-            
             return (from e in EditorBuildSettings.scenes where e != null where e.enabled select e.path).ToArray();
         }
 
@@ -42,11 +47,33 @@ namespace Ucmd.BuildPlayer
             EditorUserBuildSettings.exportAsGoogleAndroidProject = isExport;
             //是否有额外编译宏
             PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, BuildSymbols);
+
+
+#if UNITY_ANDROID_API
             //android默认目标
             EditorUserBuildSettings.androidBuildSubtarget = MobileTextureSubtarget.ASTC;
+            //android archTarget
+            switch (ArchTarget)
+            {
+                case "armv8":
+                    TargetArchitectures = AndroidArchitecture.ARM64;
+                    break;
+                case "armv7;armv8":
+                    TargetArchitectures = AndroidArchitecture.All;
+                    break;
+                default:
+                    Debug.LogWarning("Not find right $ArchTarget, so armv7 default!");
+                    TargetArchitectures = AndroidArchitecture.ARMv7;
+                    break;
+            }
+
+            PlayerSettings.Android.targetArchitectures = TargetArchitectures;
+#endif
+
             // EditorUserBuildSettings.
-            var e = BuildHelper.CheckBuildPath(ProjBuildPath);
+            var e = BuildHelper.CheckBuildPath(OutputPath);
             var path = isExport ? e : $"{e}/{DateTime.Now:yyyyMMdd-HH_mm_ss}.apk";
+            BuildHelper.CleanPath(path);
             Debug.Log($"Path: \"export target is  --->>{path}\"");
             var option = BuildHelper.IsNewCreate | isExport == false
                 ? BuildOptions.None
@@ -60,19 +87,7 @@ namespace Ucmd.BuildPlayer
         /// </summary>
         public static void Run()
         {
-            BuildHelper.CleanPath(NaAssetPath);
-            var res = new Dictionary<string, string>
-            {
-                {"unityLibrary/src/main/assets/bin", "unityLibrary/src/main/assets/bin"},
-                {"unityLibrary/src/main/jniLibs/armeabi-v7a", "unityLibrary/src/main/jniLibs/armeabi-v7a"}
-            };
             CommandBuild(true);
-            foreach (var cell in res)
-            {
-                var f = Path.Combine(ProjBuildPath, cell.Key);
-                BuildHelper.DirectoryCopy(f, Path.Combine(NaAssetPath, cell.Value), true);
-            }
-
             ExecuteHook(HookType.Finish);
         }
     }

@@ -1,8 +1,8 @@
 // ReSharper disable once CheckNamespace
 
 using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
+using UnityEngine;
 
 namespace Ucmd.BuildPlayer
 {
@@ -25,6 +25,11 @@ namespace Ucmd.BuildPlayer
         /// </summary>
         protected static string BuildSymbols = "";
         
+        /// <summary>
+        /// 打包命令传入：输出路径
+        /// </summary>
+        protected static string OutputPath = "";
+        
 
         #endregion
 
@@ -33,6 +38,7 @@ namespace Ucmd.BuildPlayer
         {
             IsRelease = StaticCall.ArgMap["isRelease"] == "true";
             BuildSymbols = StaticCall.ArgMap.ContainsKey("buildSymbols") ? StaticCall.ArgMap["buildSymbols"] : "";
+            OutputPath = StaticCall.ArgMap.ContainsKey("outputPath")? StaticCall.ArgMap["outputPath"] : Application.dataPath + "/.ucmd_build";
         }
 
         protected static string[] GetScenes()
