@@ -38,7 +38,7 @@ namespace Ucmd.BuildPlayer
         {
             IsRelease = StaticCall.ArgMap["isRelease"] == "true";
             BuildSymbols = StaticCall.ArgMap.ContainsKey("buildSymbols") ? StaticCall.ArgMap["buildSymbols"] : "";
-            OutputPath = StaticCall.ArgMap.ContainsKey("outputPath")? StaticCall.ArgMap["outputPath"] : Application.dataPath + "/.ucmd_build";
+            OutputPath = StaticCall.ArgMap.ContainsKey("_outputPath")? StaticCall.ArgMap["_outputPath"] : Application.dataPath + "/.ucmd_build";
         }
 
         protected static string[] GetScenes()

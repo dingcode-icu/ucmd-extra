@@ -16,7 +16,7 @@ namespace Ucmd.BuildPlayer
         private static string ArchTarget = "";
 
 
-        PerformBuildAndroid()
+        internal PerformBuildAndroid()
         {
             ArchTarget = StaticCall.ArgMap.ContainsKey("archTarget") ? StaticCall.ArgMap["archTarget"] : "arm-v7";
             Debug.Log($"@" +
@@ -69,23 +69,18 @@ namespace Ucmd.BuildPlayer
 
             PlayerSettings.Android.targetArchitectures = TargetArchitectures;
 #endif
-
-            // EditorUserBuildSettings.
             var e = BuildHelper.CheckBuildPath(OutputPath);
             var path = isExport ? e : $"{e}/{DateTime.Now:yyyyMMdd-HH_mm_ss}.apk";
             BuildHelper.CleanPath(path);
             Debug.Log($"Path: \"export target is  --->>{path}\"");
-            var option = BuildHelper.IsNewCreate | isExport == false
-                ? BuildOptions.None
-                : //new create || autorun
-                BuildOptions.AcceptExternalModificationsToPlayer; //allow append || autorun
+            var option = BuildOptions.CleanBuildCache;
             BuildPipeline.BuildPlayer(scenes, path, BuildTarget.Android, option);
         }
 
         /// <summary>
         /// Ucmd外部调用函数入口
         /// </summary>
-        public static void Run()
+        public void Run()
         {
             CommandBuild(true);
             ExecuteHook(HookType.Finish);

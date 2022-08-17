@@ -17,10 +17,10 @@ namespace Ucmd.BuildPlayer
             switch (plat)
             {
                 case "android":
-                    PerformBuildAndroid.Run();
+                    new PerformBuildAndroid().Run();
                     break;
                 case "ios":
-                    PerformBuildIOS.Run();
+                    new PerformBuildIOS().Run();
                     break;
                 default:
                     Debug.LogError($"Platform of <{plat}> is not support yet!");
@@ -32,21 +32,22 @@ namespace Ucmd.BuildPlayer
         private static void PrepareArgs()
         {
             var cmdArgs = Environment.GetCommandLineArgs();
+            var disVal = "";
             foreach (var v in cmdArgs)
             {
                 if (v.StartsWith("-") && v.Split(":").Length > 1)
                 {
-                    var l = v.Split(":");
-                    var k = l[0].Substring(1);
-                    var val = l[1];
+                    var spIndex = v.IndexOf(":",  StringComparison.Ordinal);
+                    var k = v[1..spIndex];
+                    var val = v[(spIndex + 1)..v.Length];
                     ArgMap[k] = val;
+                    disVal += $"{k}: {val}\n";
                 }
             }
             Debug.Log($@"
 ***********************************
 Option params in command:
-_targetPlatform: {ArgMap["_targetPlatform"]}
-{ArgMap}
+{disVal.Substring(0, disVal.Length - 1)}
 ***********************************
 ");
         }
