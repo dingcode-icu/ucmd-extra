@@ -32,8 +32,17 @@ namespace Ucmd.BuildPlayer
             EditorUserBuildSettings.development = IsRelease;
             //是否有额外编译宏
             PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.iOS, BuildSymbols);
-            var option = BuildOptions.CleanBuildCache;
-            BuildPipeline.BuildPlayer(scenes, path, BuildTarget.iOS, option);
+
+
+            #if UNITY_2021_3_OR_NEWER
+                var option = BuildOptions.CleanBuildCache;
+                BuildPipeline.BuildPlayer(scenes, path, BuildTarget.iOS, option);
+            #else 
+                var option = BuildOptions.None;
+                BuildPipeline.BuildPlayer(scenes, path, BuildTarget.iOS, option);
+            #endif
+
+
             ExecuteHook(HookType.Finish);
         }
     }

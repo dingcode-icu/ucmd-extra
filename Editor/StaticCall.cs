@@ -35,11 +35,13 @@ namespace Ucmd.BuildPlayer
             var disVal = "";
             foreach (var v in cmdArgs)
             {
-                if (v.StartsWith("-") && v.Split(":").Length > 1)
+                if (v.StartsWith("-") && v.Split(':').Length > 1)
                 {
                     var spIndex = v.IndexOf(":",  StringComparison.Ordinal);
-                    var k = v[1..spIndex];
-                    var val = v[(spIndex + 1)..v.Length];
+                    var k = v.Substring(1, spIndex - 1);
+                    Debug.Log($"k={k}, spindex={spIndex}111111111");
+                    var val = v.Substring(spIndex + 1); 
+                    Debug.Log($"k={k} , v={val}   111111111");
                     ArgMap[k] = val;
                     disVal += $"{k}: {val}\n";
                 }
