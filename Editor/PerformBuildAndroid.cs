@@ -13,41 +13,36 @@ namespace Ucmd.BuildPlayer
         /// <summary>
         /// 打包命令传入：目标arch
         /// </summary>
-        private static string ArchTarget = "";
+        private static string _archTarget = "";
 
 
         /// <summary>
         /// 打包命令传入：目标subTarget
         /// </summary>
-        private static string SubTarget = "";
+        private static string _subTarget = "";
 
 
         /// <summary>
         /// 打包命令传入：是否导出工程
         /// </summary>
-        private static bool IsExport = true;
+        private static bool _isExport = true;
 
         internal PerformBuildAndroid()
         {
-            ArchTarget = StaticCall.ArgMap.ContainsKey("archTarget") ? StaticCall.ArgMap["archTarget"] : "arm-v7";
-            SubTarget = StaticCall.ArgMap.ContainsKey("subTarget") ? StaticCall.ArgMap["subTarget"] : "unset";
-            IsExport = StaticCall.ArgMap.ContainsKey("isExport") ? StaticCall.ArgMap["isExport"] == "false": true;
+            _archTarget = StaticCall.ArgMap.ContainsKey("archTarget") ? StaticCall.ArgMap["archTarget"] : "arm-v7";
+            _subTarget = StaticCall.ArgMap.ContainsKey("subTarget") ? StaticCall.ArgMap["subTarget"] : "unset";
+            _isExport = !StaticCall.ArgMap.ContainsKey("isExport") || StaticCall.ArgMap["isExport"] == "false";
 
             Debug.Log($@"
 ***********************************
 Android params in ucmd is 
-archTarget:{ArchTarget} 
-isExport:{IsExport.ToString()}
-subTarget:{SubTarget}
+archTarget:{_archTarget} 
+isExport:{_isExport.ToString()}
+subTarget:{_subTarget}
 ***********************************
 ");
         }
-
-#if UNITY_ANDROID_API
-        private static AndroidArchitecture TargetArchitectures = AndroidArchitecture.ARMv7;
-
-        private static MobileTextureSubtarget SubTargetAnd =  MobileTextureSubtarget.ASTC;
-#endif
+        
         /// <summary>
         /// 获取要打包的所有的scene
         /// </summary>
@@ -63,39 +58,38 @@ subTarget:{SubTarget}
             //isRelease?
             EditorUserBuildSettings.development = IsRelease;
             //isExport? 
-            EditorUserBuildSettings.exportAsGoogleAndroidProject = IsExport;
+            EditorUserBuildSettings.exportAsGoogleAndroidProject = _isExport;
             //是否有额外编译宏
             PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, BuildSymbols);
 
-#if UNITY_ANDROID_API
+#if UNITY_ANDROID
             //android subTarget
-            switch (SubTarget)
+            switch (_subTarget)
             {
                 default:
                     Debug.LogWarning("Not find right $SubTarget, so use editor-setting default!");
                     //android默认目标
                     break;
             }
-            EditorUserBuildSettings.androidBuildSubtarget = SubTargetAnd;
 
             //android archTarget
-            switch (ArchTarget)
+            switch (_archTarget)
             {
                 case "armv8":
-                    TargetArchitectures = AndroidArchitecture.ARM64;
+                    PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64;
                     break;
                 case "armv7;armv8":
-                    TargetArchitectures = AndroidArchitecture.All;
+                    PlayerSettings.Android.targetArchitectures = AndroidArchitecture.ARM64 | AndroidArchitecture.ARMv7;
                     break;
                 default:
-                    Debug.LogWarning("Not find right $ArchTarget, so armv7 default!");
-                    TargetArchitectures = AndroidArchitecture.ARMv7;
+                    Debug.LogWarning("Not find right $ArchTarget, so use editor-setting default!");
                     break;
             }
-            PlayerSettings.Android.targetArchitectures = TargetArchitectures;
+            
+            Debug.LogWarning($"[performbuildandroid]android target architecture is {PlayerSettings.Android.targetArchitectures.ToString()}");
 #endif
             var e = BuildHelper.CheckBuildPath(OutputPath);
-            var path = IsExport ? e : $"{e}/{DateTime.Now:yyyyMMdd-HH_mm_ss}.apk";
+            var path = _isExport ? e : $"{e}/{DateTime.Now:yyyyMMdd-HH_mm_ss}.apk";
             BuildHelper.CleanPath(path);
             Debug.Log($"Path: \"export target is  --->>{path}\"");
             #if UNITY_2021_3_OR_NEWER

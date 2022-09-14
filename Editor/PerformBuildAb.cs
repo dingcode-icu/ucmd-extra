@@ -8,8 +8,16 @@ namespace Ucmd.BuildPlayer
 {
     public class PerformBuildAb : BuildBase
     {
-        private static string _relPath;
-        private static readonly string AbBuildPath = Application.dataPath + "/../../../build/AbBuild";
+
+        private static BuildTarget _buildTarget = BuildTarget.NoTarget;
+
+
+        private static string _abMap = "";
+        
+        internal PerformBuildAb(){
+            _abMap = StaticCall.ArgMap.ContainsKey("abMap") ? StaticCall.ArgMap["abMap"] : string.Empty;
+        }
+        
 
         private static List<string> GetPathAssets(string path)
         {
@@ -19,6 +27,7 @@ namespace Ucmd.BuildPlayer
             {
                 if (p.StartsWith(path) && p != path)
                 {
+                    Debug.Log($"Find the asset path is {p}");
                     if (p.EndsWith(".cs") ||
                          p.EndsWith(".unity") ||
                           p.Contains("squishy")) continue;
@@ -38,16 +47,18 @@ namespace Ucmd.BuildPlayer
             
         }
 
-        private static (string, BuildTarget) GetOsExStr(string tarp)
+        private static (string, BuildTarget) GetOsExStr()
         {
+            var tarp = EditorUserBuildSettings.activeBuildTarget;
             switch (tarp)
             {
-                case "android":
+                case BuildTarget.Android:
                     return ("and", BuildTarget.Android);
-                case "ios":
+                case BuildTarget.iOS:
                     return ("ios", BuildTarget.iOS);
                 default:
-                    return ("", BuildTarget.StandaloneOSX);
+                    Debug.LogWarning("Activity buidl target {} not support ab build yet!do nothing!");
+                    return ("unknown", BuildTarget.NoTarget);
             }
         }
 
@@ -92,36 +103,33 @@ namespace Ucmd.BuildPlayer
         /// <summary>
         /// 从外部调用 构建ab包
         /// </summary>
-        public static void Build()
+        public void Run()
         {
-            var dir = BuildHelper.CheckBuildPath(AbBuildPath);
-            Debug.Log(_relPath);
-            if (_relPath == string.Empty)
+            var dir = BuildHelper.CheckBuildPath(OutputPath);
+            if (_abMap == string.Empty)
             {
-                Debug.Log("Not found relative path to execute build asset bundle. ");
-                Environment.Exit(0);
+                Debug.LogWarning("No <abMap> params set , so build noting!");
+                return;
             }
-
-            var ls = _relPath.Split('|');
+            
+            var (ex, tar) = GetOsExStr();
+            Debug.Log($"Found ab build params-->> target={tar}, ex={ex}");
+            var ls = _abMap.Split('|');
             Debug.Log($"{ls}");
             foreach (var p in ls)
             {
                 var vl = p.Split('=');
                 Debug.Log($"out value is {string.Join(",", vl)}");
-                var name = vl[1];
-                var assetPath = vl[0];
+                var assetPath = vl[1];
+                var name = vl[0];
                 var pl = GetPathAssets(assetPath);
                 foreach (var f in pl)
                 {
-
                     var ai = AssetImporter.GetAtPath(f);
-
                     ai.assetBundleName = name;
                 }
-
-                var (ex, tar) = GetOsExStr("ab");
                 var cur = $"{DateTime.Now:yyyyMMddhhmmss}";
-                Debug.Log($"bundle_{name}{ex}_{cur}.ab---->>>>11");
+                Debug.Log($"build file target is ->bundle_{name}{ex}_{cur}.ab");
                 var ab = new AssetBundleBuild()
                 {
                     assetBundleName = $"bundle_{name}{ex}_{cur}.ab",

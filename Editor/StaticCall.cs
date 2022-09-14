@@ -6,7 +6,6 @@ namespace Ucmd.BuildPlayer
 {
     public class StaticCall
     {
-
         public static readonly Dictionary<string, string> ArgMap = new Dictionary<string, string>();
 
         public static void Run()
@@ -22,11 +21,13 @@ namespace Ucmd.BuildPlayer
                 case "ios":
                     new PerformBuildIOS().Run();
                     break;
+                case "ab":
+                    new PerformBuildAb().Run();
+                    break;
                 default:
                     Debug.LogError($"Platform of <{plat}> is not support yet!");
                     break;
             }
-
         }
 
         private static void PrepareArgs()
@@ -37,15 +38,14 @@ namespace Ucmd.BuildPlayer
             {
                 if (v.StartsWith("-") && v.Split(':').Length > 1)
                 {
-                    var spIndex = v.IndexOf(":",  StringComparison.Ordinal);
+                    var spIndex = v.IndexOf(":", StringComparison.Ordinal);
                     var k = v.Substring(1, spIndex - 1);
-                    Debug.Log($"k={k}, spindex={spIndex}111111111");
-                    var val = v.Substring(spIndex + 1); 
-                    Debug.Log($"k={k} , v={val}   111111111");
+                    var val = v.Substring(spIndex + 1);
                     ArgMap[k] = val;
                     disVal += $"{k}: {val}\n";
                 }
             }
+
             Debug.Log($@"
 ***********************************
 Option params in command:
