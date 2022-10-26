@@ -62,7 +62,6 @@ subTarget:{_subTarget}
             //是否有额外编译宏
             PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, BuildSymbols);
 
-#if UNITY_ANDROID
             //android subTarget
             switch (_subTarget)
             {
@@ -71,7 +70,6 @@ subTarget:{_subTarget}
                     //android默认目标
                     break;
             }
-
             //android archTarget
             switch (_archTarget)
             {
@@ -87,7 +85,6 @@ subTarget:{_subTarget}
             }
             
             Debug.LogWarning($"[performbuildandroid]android target architecture is {PlayerSettings.Android.targetArchitectures.ToString()}");
-#endif
             var e = BuildHelper.CheckBuildPath(OutputPath);
             var path = _isExport ? e : $"{e}/{DateTime.Now:yyyyMMdd-HH_mm_ss}.apk";
             BuildHelper.CleanPath(path);
