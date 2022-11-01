@@ -23,11 +23,8 @@ namespace Ucmd.BuildPlayer
         {
             var al = AssetDatabase.GetAllAssetPaths();
             var rl = new List<string>();
-            // Debug.Log($"all assetpath is _>{string.Join("-\n", al)}");
-            
             foreach (var p in al)
             {
-                Debug.Log($"all assetpath is _>{p} starts with {path}, is {p.StartsWith(path)}");
                 if (p.StartsWith(path) && p != path)
                 {
                     Debug.Log($"Find the asset path is {p}");
@@ -59,9 +56,8 @@ namespace Ucmd.BuildPlayer
                     return ("and", BuildTarget.Android);
                 case BuildTarget.iOS:
                     return ("ios", BuildTarget.iOS);
-                case BuildTarget.StandaloneWindows64:
-                    return ("win64", BuildTarget.StandaloneWindows64);
                 default:
+                    Debug.LogWarning("Activity buidl target {} not support ab build yet!do nothing!");
                     return ("unknown", BuildTarget.NoTarget);
             }
         }

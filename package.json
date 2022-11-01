@@ -1,6 +1,6 @@
 {
 	"name":"com.dwb.ucmd",
-	"version":"1.0.2",
+	"version":"1.0.3",
 	"description": "额外的构建参数支持，扩展工程命令行构建能力",
 	"displayName":"Ucmd Extra",
 	"author":{

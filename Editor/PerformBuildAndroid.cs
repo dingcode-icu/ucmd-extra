@@ -56,12 +56,11 @@ subTarget:{_subTarget}
         {
             var scenes = GetBuildScenes();
             //isRelease?
-            EditorUserBuildSettings.development = IsRelease;
+            EditorUserBuildSettings.development = IsDev;
             //isExport? 
             EditorUserBuildSettings.exportAsGoogleAndroidProject = _isExport;
             //是否有额外编译宏
             PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, BuildSymbols);
-
             //android subTarget
             switch (_subTarget)
             {
@@ -70,6 +69,7 @@ subTarget:{_subTarget}
                     //android默认目标
                     break;
             }
+
             //android archTarget
             switch (_archTarget)
             {

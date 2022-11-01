@@ -11,7 +11,7 @@ namespace Ucmd.BuildPlayer
         internal PerformBuildIOS()
         {
             Debug.Log($"@" +
-                      $"isRelease:{IsRelease}" +
+                      $"IsDev:{IsDev}" +
                       $"buildTarget{BuildSymbols}" +
                       $"outputPath{OutputPath}");
         }
@@ -29,7 +29,7 @@ namespace Ucmd.BuildPlayer
             var scenes = GetBuildScenes();
             var path = BuildHelper.CheckBuildPath(OutputPath);
             //是否是测试包
-            EditorUserBuildSettings.development = IsRelease;
+            EditorUserBuildSettings.development = IsDev;
             //是否有额外编译宏
             PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.iOS, BuildSymbols);
 

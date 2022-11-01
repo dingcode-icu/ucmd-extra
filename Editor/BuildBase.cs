@@ -18,7 +18,7 @@ namespace Ucmd.BuildPlayer
         /// <summary>
         /// 打包命令传入：是否是release编译
         /// </summary>
-        protected static bool IsRelease { set; get; }
+        protected static bool IsDev { set; get; }
 
         /// <summary>
         /// 打包命令传入：宏定义
@@ -40,7 +40,7 @@ namespace Ucmd.BuildPlayer
 
         protected BuildBase()
         {
-            IsRelease = StaticCall.ArgMap["isRelease"] == "true";
+            IsDev = StaticCall.ArgMap["isDev"] == "true";
             BuildSymbols = StaticCall.ArgMap.ContainsKey("buildSymbols") ? StaticCall.ArgMap["buildSymbols"] : "";
             TargetPlatform =  StaticCall.ArgMap.ContainsKey("_targetPlatform")? StaticCall.ArgMap["_targetPlatform"] : "unknown";
             OutputPath = StaticCall.ArgMap.ContainsKey("_outputPath")? StaticCall.ArgMap["_outputPath"] : Application.dataPath + "/.ucmd_build";
@@ -55,7 +55,7 @@ _targetPlatform:{TargetPlatform}
             Debug.Log($@"
 ***********************************
 Global params in ucmd is
-isRelease:{IsRelease} 
+IsDev:{IsDev} 
 buildSymbols:{BuildSymbols}
 ***********************************
 ");
